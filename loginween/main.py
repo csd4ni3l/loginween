@@ -1,8 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, g
+from flask import Flask, Response, render_template, redirect, url_for, g, request
 
 from flask_login import LoginManager, login_required
 
-import sqlite3, os, flask_login, dotenv, secrets
+from loginween.pattern import Pattern
+
+import sqlite3, os, flask_login, dotenv, secrets, json
 
 if os.path.exists(".env"):
     dotenv.load_dotenv(".env")
@@ -23,7 +25,7 @@ def get_db():
         db.execute("""
             CREATE TABLE IF NOT EXISTS Users (
                 username TEXT PRIMARY KEY,
-                pumpkin_carving TEXT PRIMARY KEY
+                pattern TEXT UNIQUE
             )
         """)
 
@@ -53,12 +55,60 @@ def unathorized_handler():
 def main():
     return render_template("index.jinja2")
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    return render_template("login.jinja2")
+    if request.method == "GET":
+        if flask_login.current_user.is_authenticated:
+            return redirect(url_for("main"))
 
-@app.route("/register")
+        return render_template("login.jinja2", grid_size=os.getenv("GRID_SIZE", 25))
+    
+    elif request.method == "POST":
+        username = request.form["username"]
+        pattern = Pattern.from_str(request.form["pattern"])
+
+        cur = get_db().cursor()
+
+        cur.execute("SELECT pattern from Users WHERE username = ?", (username, ))
+
+        required_pattern = cur.fetchone()
+        if not required_pattern:
+            cur.close()
+            return Response("An account with this username doesn't exist.", 400)
+
+        if pattern == Pattern.from_json_str(required_pattern[0]):
+            cur.close()
+
+            user = User()
+            user.id = username
+            flask_login.login_user(user, remember=True)
+
+            return redirect(url_for("main"))
+
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    return render_template("register.jinja2")
+    if request.method == "GET":
+        if flask_login.current_user.is_authenticated:
+            return redirect(url_for("main"))
+        
+        return render_template("register.jinja2", grid_size=os.getenv("GRID_SIZE", 25))
+    
+    elif request.method == "POST":
+        username = request.form["username"]
+        pattern = Pattern.from_str(request.form["pattern"])
+
+        cur = get_db().cursor()
+
+        cur.execute("SELECT username from Users WHERE username = ?", (username, ))
+
+        if cur.fetchone():
+            cur.close()
+            return Response("An account with this username already exists.", 400)
+
+        cur.execute("INSERT INTO Users (username, pattern) VALUES (?, ?)", (username, pattern.to_json_str()))
+        get_db().commit()
+        cur.close()
+
+        return redirect(url_for("login"))
 
 app.run(host=os.getenv("HOST", "0.0.0.0"), port=os.getenv("PORT", 8080), debug=os.getenv("DEBUG_MODE", False))
