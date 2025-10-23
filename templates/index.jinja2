@@ -7,6 +7,9 @@
     <a class="nav-link active" aria-current="page" href="/">Home</a>
 </li>
 <li class="nav-item">
+    <a class="nav-link" href="/countdown">Countdown</a>
+</li>
+<li class="nav-item">
     <a class="nav-link" href="/profile">Profile</a>
 </li>
 <li class="nav-item">
@@ -16,6 +19,14 @@
 
 {% block body %}
 <div class="position-absolute top-50 start-50 translate-middle text-center">
-    <p>LoginWeen is a an app where you login/register with a halloween pumpkin carving as a password.</p>
+    {% for post in posts %}
+    <div class="card" style="width: 18rem;">
+        <canvas class="card-img-top"></canvas>
+        <div class="card-body">
+            <h5 class="card-title">{{ post.1 }}: {{ post.3 }}</h5>
+            <p class="card-text">{{ post.2 }}</p>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endblock body %}

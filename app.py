@@ -71,9 +71,15 @@ def main():
 
     cur.execute("SELECT * FROM Posts LIMIT 20")
 
+    posts = cur.fetchall()
+
     cur.close()
 
-    return render_template("index.jinja2", username=username)
+    return render_template("index.jinja2", username=username, posts=posts)
+
+@app.route("/countdown")
+def countdown():
+    return render_template("countdown.jinja2", logged_in=flask_login.current_user.is_authenticated, grid_size=os.getenv("GRID_SIZE", 15))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
