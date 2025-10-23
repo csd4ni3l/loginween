@@ -111,4 +111,4 @@ def register():
 
         return redirect(url_for("login"))
 
-app.run(host=os.getenv("HOST", "0.0.0.0"), port=os.getenv("PORT", 8080), debug=os.getenv("DEBUG_MODE", False))
+app.run(host=os.getenv("HOST", "0.0.0.0"), port=int(os.getenv("PORT", 8080)), debug=os.getenv("DEBUG_MODE", False).lower() == "true")
