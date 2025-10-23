@@ -25,7 +25,7 @@
         </div>
         <div class="buttons">
             <button type="submit" class="btn btn-primary me-2" id="loginBtn">Login</button>
-            <button id="clearBtn" class="btn btn-danger">Clear</button>
+            <button type="button" id="clearBtn" class="btn btn-danger">Clear</button>
         </div>
     </div>
 </form>
@@ -74,9 +74,6 @@ function draw(e) {
             ctx.fillStyle = 'black'; 
             ctx.fillRect(cellX - CELL_SIZE / 3, cellY - CELL_SIZE / 3, CELL_SIZE, CELL_SIZE);
         }
-    }
-    else {
-        console.log(pixel);
     }
 }
 

@@ -1,4 +1,6 @@
-import json
+import json, random, time
+
+systemrandom = random.SystemRandom()
 
 class Pattern():
     def __init__(self, data: list[tuple]):
@@ -19,4 +21,6 @@ class Pattern():
         if not isinstance(value, Pattern):
             return False
     
+        time.sleep(systemrandom.uniform(0.001, 0.5)) # prevent timing attacks
+
         return set(self.data) == set(value.data)

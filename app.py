@@ -25,9 +25,20 @@ def get_db():
         db.execute("""
             CREATE TABLE IF NOT EXISTS Users (
                 username TEXT PRIMARY KEY,
-                pattern TEXT UNIQUE
+                pattern TEXT NOT NULL
             )
         """)
+
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS Posts (
+                id INTEGER PRIMARY KEY,
+                username TEXT,
+                comment TEXT,
+                pattern TEXT NOT NULL
+            )
+        """)
+
+        db.commit()
 
     return db
 
@@ -61,7 +72,7 @@ def login():
         if flask_login.current_user.is_authenticated:
             return redirect(url_for("main"))
 
-        return render_template("login.jinja2", grid_size=os.getenv("GRID_SIZE", 25))
+        return render_template("login.jinja2", grid_size=os.getenv("GRID_SIZE", 15))
     
     elif request.method == "POST":
         username = request.form["username"]
@@ -91,7 +102,7 @@ def register():
         if flask_login.current_user.is_authenticated:
             return redirect(url_for("main"))
         
-        return render_template("register.jinja2", grid_size=os.getenv("GRID_SIZE", 25))
+        return render_template("register.jinja2", grid_size=os.getenv("GRID_SIZE", 15))
     
     elif request.method == "POST":
         username = request.form["username"]
@@ -99,7 +110,7 @@ def register():
 
         cur = get_db().cursor()
 
-        cur.execute("SELECT username from Users WHERE username = ?", (username, ))
+        cur.execute("SELECT pattern from Users WHERE username = ?", (username, ))
 
         if cur.fetchone():
             cur.close()
@@ -110,5 +121,86 @@ def register():
         cur.close()
 
         return redirect(url_for("login"))
+    
+@app.route("/posts")
+@login_required
+def posts():
+    username = flask_login.current_user.id
+    return render_template("posts.jinja2", username=username)
+
+@app.route("/profile")
+@login_required
+def profile():
+    username = flask_login.current_user.id
+    return render_template("profile.jinja2", username=username, grid_size=os.getenv("GRID_SIZE", 15), logged_in_account=True)
+
+@app.route("/profile/<username>")
+def profile_external(username):
+    return render_template("profile.jinja2", username=username, grid_size=os.getenv("GRID_SIZE", 15), logged_in_account=False)
+
+@app.route("/change_username", methods=["POST"])
+@login_required
+def change_username():
+    username = flask_login.current_user.id
+
+    new_username = request.form["new_username"]
+
+    cur = get_db().cursor()
+
+    cur.execute("UPDATE Users SET username = ? WHERE username = ?", (new_username, username))
+
+    get_db().commit()
+    cur.close()
+
+    flask_login.logout_user()
+    return redirect(url_for("login"))
+
+@app.route("/change_pattern", methods=["POST"])
+@login_required
+def change_pattern():
+    username = flask_login.current_user.id
+
+    current_pattern, new_pattern = request.form["current_pattern"], request.form["new_pattern"]
+
+    cur = get_db().cursor()
+
+    cur.execute("SELECT pattern FROM Users WHERE username = ?", (username,))
+    row = cur.fetchone()
+
+    if not row:
+        cur.close()
+        return Response("No pattern exists? WTF?", 500)
+    
+    if not Pattern.from_str(current_pattern) == Pattern.from_json_str(row[0]):
+        cur.close()
+        return Response("Invalid Pattern", 401)
+    
+    cur.execute("UPDATE Users SET pattern = ? WHERE username = ?", (Pattern.from_str(new_pattern).to_json_str(), username))
+    get_db().commit()
+    cur.close()
+
+    flask_login.logout_user() # not logout redirect because that might fail and we would be in a weird state
+    return redirect(url_for("login"))
+
+@app.route("/delete_account")
+@login_required
+def delete_account():
+    username = flask_login.current_user.id
+
+    cur = get_db().cursor()
+
+    cur.execute("DELETE FROM Users WHERE username = ?", (username,))
+
+    get_db().commit()
+    cur.close()
+
+    flask_login.logout_user() # not logout redirect because that might fail and we would be in a weird state
+    return redirect(url_for("login"))
+
+@app.route("/logout")
+@login_required
+def logout():
+    flask_login.logout_user()
+    return redirect(url_for("login"))
 
 app.run(host=os.getenv("HOST", "0.0.0.0"), port=int(os.getenv("PORT", 8080)), debug=os.getenv("DEBUG_MODE", False).lower() == "true")

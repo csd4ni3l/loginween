@@ -86,7 +86,7 @@ wheels = [
 [[package]]
 name = "loginween"
 version = "0.0.1"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "flask" },
     { name = "flask-login" },
