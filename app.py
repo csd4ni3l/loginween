@@ -2,14 +2,14 @@ from flask import Flask, Response, render_template, redirect, url_for, g, reques
 
 from flask_login import LoginManager, login_required
 
-from loginween.pattern import Pattern
+from pattern import Pattern
 
-import sqlite3, os, flask_login, dotenv, secrets, json
+import sqlite3, os, flask_login, dotenv, secrets
 
 if os.path.exists(".env"):
     dotenv.load_dotenv(".env")
 else:
-    print(".env file not found. Continuing with default values.")
+    print(".env file not found. Continuing with Docker environment or default values.")
 
 login_manager = LoginManager()
 app = Flask(__name__)

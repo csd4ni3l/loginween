@@ -1,0 +1,16 @@
+services:
+  loginween:
+    image: csd4ni3lofficial/loginween:latest
+    build: .
+    container_name: loginween
+    ports:
+      - "8080:8080"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: 8080
+      DB_FILE: "data.db"
+      APP_KEY: "changeme"
+      DEBUG_MODE: false
+    volumes:
+      - ./data.db:/app/data.db
+    restart: unless-stopped
