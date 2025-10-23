@@ -32,9 +32,10 @@ def get_db():
         db.execute("""
             CREATE TABLE IF NOT EXISTS Posts (
                 id INTEGER PRIMARY KEY,
-                username TEXT,
-                comment TEXT,
-                pattern TEXT NOT NULL
+                username TEXT NOT NULL UNIQUE,
+                comment TEXT NOT NULL,
+                pattern TEXT NOT NULL,
+                creation_time INTEGER NOT NULL
             )
         """)
 
@@ -64,7 +65,15 @@ def unathorized_handler():
 @app.route("/")
 @login_required
 def main():
-    return render_template("index.jinja2")
+    username = flask_login.current_user.id
+
+    cur = get_db().cursor()
+
+    cur.execute("SELECT * FROM Posts LIMIT 20")
+
+    cur.close()
+
+    return render_template("index.jinja2", username=username)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -122,12 +131,6 @@ def register():
 
         return redirect(url_for("login"))
     
-@app.route("/posts")
-@login_required
-def posts():
-    username = flask_login.current_user.id
-    return render_template("posts.jinja2", username=username)
-
 @app.route("/profile")
 @login_required
 def profile():
