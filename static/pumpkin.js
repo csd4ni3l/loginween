@@ -32,22 +32,52 @@ function drawGrid(ctx, canvas, GRID_SIZE) {
     }
 }
 
-function check_colorable(ctx, CELL_SIZE, gridX, gridY) {
-    var cellX = gridX * CELL_SIZE + CELL_SIZE / 3;
-    var cellY = gridY * CELL_SIZE + CELL_SIZE / 3;
-    var pixel = ctx.getImageData(cellX, cellY, 1, 1).data;
-    return (pixel[0] >= 254 && (pixel[1] >= 124 && pixel[1] <= 126));
+function is_orange(r, g) {
+    return (r >= 250 && (g >= 121 && g <= 130));
 }
 
-function check_and_color(ctx, CELL_SIZE, currentPattern, gridX, gridY) {
-    if (check_colorable(ctx, CELL_SIZE, gridX, gridY)) {
+function getPixel(image_data, canvas_width, x, y) {
+    const index = (Math.floor(y) * canvas_width + Math.floor(x)) * 4;
+    
+    return {
+        r: image_data[index],
+        g: image_data[index + 1],
+        b: image_data[index + 2],
+        a: image_data[index + 3]
+    };
+}
+
+function check_colorable(image_data, canvas_width, CELL_SIZE, gridX, gridY) {
+    const cellX = gridX * CELL_SIZE;
+    const cellY = gridY * CELL_SIZE;
+
+    offset = 5
+    
+    const topLeft = getPixel(image_data, canvas_width, cellX + offset, cellY + offset);
+    const topRight = getPixel(image_data, canvas_width, cellX + CELL_SIZE - offset, cellY + offset);
+    const bottomLeft = getPixel(image_data, canvas_width, cellX + offset, cellY + CELL_SIZE - offset);
+    const bottomRight = getPixel(image_data, canvas_width, cellX + CELL_SIZE - offset, cellY + CELL_SIZE - offset);
+
+    console.log(topLeft, topRight, bottomLeft, bottomRight)
+
+    return is_orange(topLeft.r, topLeft.g) &&
+           is_orange(topRight.r, topRight.g) &&
+           is_orange(bottomLeft.r, bottomLeft.g) &&
+           is_orange(bottomRight.r, bottomRight.g);
+}
+
+function check_and_color(ctx, CELL_SIZE, currentPattern, gridX, gridY, image_data = null) {
+    if (!image_data) {
+        image_data = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+    }
+
+    if (check_colorable(image_data, ctx.canvas.width, CELL_SIZE, gridX, gridY)) {
         var key = `${gridX},${gridY}`;
         if (!currentPattern.includes(key)) {
             currentPattern.push(key);
-            var cellX = gridX * CELL_SIZE + CELL_SIZE / 3;
-            var cellY = gridY * CELL_SIZE + CELL_SIZE / 3;
-            ctx.fillStyle = 'transparent';
-            ctx.clearRect(cellX - CELL_SIZE / 3, cellY - CELL_SIZE / 3, CELL_SIZE, CELL_SIZE);
+            var cellX = gridX * CELL_SIZE;
+            var cellY = gridY * CELL_SIZE;
+            ctx.clearRect(cellX, cellY, CELL_SIZE, CELL_SIZE);
             return true;
         } else {
             return false;
@@ -65,13 +95,15 @@ function color_amount(ctx, canvas, grid_size, amount) {
     let colored = 0;
     const cell_size = canvas.width / grid_size;
     let currentPattern = [];
+    
+    const image_data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
     for (let y = 0; y < grid_size; y++) {
         for (let x = 0; x < grid_size; x++) {
             if (colored == amount) {
                 return currentPattern;
             }
-            if (check_and_color(ctx, cell_size, currentPattern, x, y)) {
+            if (check_and_color(ctx, cell_size, currentPattern, x, y, image_data)) {
                 colored++;
             }
         }
@@ -83,11 +115,13 @@ function color_amount(ctx, canvas, grid_size, amount) {
 function draw_pattern(ctx, canvas, pattern, grid_size) {
     const cell_size = canvas.width / grid_size;
     let currentPattern = [];
+    
+    const image_data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
     for (let x = 0; x < grid_size; x++) {
         for (let y = 0; y < grid_size; y++) {
             if (includesPoint(pattern, [x, y])) {
-                check_and_color(ctx, cell_size, currentPattern, x, y);
+                check_and_color(ctx, cell_size, currentPattern, x, y, image_data);
             }
         }
     }
@@ -99,9 +133,11 @@ function get_colorable(ctx, canvas, grid_size) {
     let colorable = 0;
     const cell_size = canvas.width / grid_size;
 
-    for (let x = 0; x < grid_size; x++) {
-        for (let y = 0; y < grid_size; y++) {
-            if (check_colorable(ctx, cell_size, x, y)) {
+    const image_data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+    for (let y = 0; y < grid_size; y++) {
+        for (let x = 0; x < grid_size; x++) {
+            if (check_colorable(image_data, canvas.width, cell_size, x, y)) {
                 colorable++;
             }
         }
