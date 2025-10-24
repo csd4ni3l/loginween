@@ -17,17 +17,36 @@ function clearCanvas(ctx, canvas, img, GRID_SIZE, currentPattern) {
 
 function drawGrid(ctx, canvas, GRID_SIZE) {
     const cell_size = canvas.width / GRID_SIZE;
+    const image_data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
     ctx.lineWidth = 1;
+    
     for (let i = 0; i <= GRID_SIZE; i++) {
         const pos = i * cell_size;
+        
         ctx.beginPath();
-        ctx.moveTo(pos, 0);
-        ctx.lineTo(pos, canvas.height);
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const checkLeft = i > 0 && check_colorable(image_data, canvas.width, cell_size, i - 1, j);
+            const checkRight = i < GRID_SIZE && check_colorable(image_data, canvas.width, cell_size, i, j);
+            
+            if (checkLeft || checkRight) {
+                ctx.moveTo(pos, j * cell_size);
+                ctx.lineTo(pos, (j + 1) * cell_size);
+            }
+        }
         ctx.stroke();
+        
         ctx.beginPath();
-        ctx.moveTo(0, pos);
-        ctx.lineTo(canvas.width, pos);
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const checkAbove = i > 0 && check_colorable(image_data, canvas.width, cell_size, j, i - 1);
+            const checkBelow = i < GRID_SIZE && check_colorable(image_data, canvas.width, cell_size, j, i);
+            
+            if (checkAbove || checkBelow) {
+                ctx.moveTo(j * cell_size, pos);
+                ctx.lineTo((j + 1) * cell_size, pos);
+            }
+        }
         ctx.stroke();
     }
 }
