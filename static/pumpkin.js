@@ -153,7 +153,6 @@ function unlight_pumpkin(ctx, cell_size, currentPattern) {
 
 function setup_lightbtn(ctx, cell_size, lightbtn_id, pattern) {
     let lit = { value: false };
-    
     document.getElementById(lightbtn_id).addEventListener('click', function(event) {
         if (lit.value) {
             lit.value = false;

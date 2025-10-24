@@ -5,7 +5,7 @@ from datetime import datetime
 
 from pattern import Pattern
 
-import sqlite3, os, flask_login, dotenv, secrets, html
+import sqlite3, os, flask_login, dotenv, secrets, html, time
 
 if os.path.exists(".env"):
     dotenv.load_dotenv(".env")
@@ -132,7 +132,7 @@ def register():
     
     elif request.method == "POST":
         if request.form["username"] != html.escape(request.form["username"], quote=True):
-            return "No XSS please"
+            return Response("No XSS please", 400)
 
         username = html.escape(request.form["username"], quote=True)
         pattern = Pattern.from_str(request.form["pattern"])
@@ -161,13 +161,31 @@ def profile():
 def profile_external(username):
     return render_template("profile.jinja2", username=username, grid_size=os.getenv("GRID_SIZE", 15), logged_in_account=False)
 
+@app.route("/submit_post", methods=["POST"])
+@login_required
+def submit_post():
+    username = flask_login.current_user.id
+    pattern, comment = Pattern.from_str(request.form["pattern"]), request.form["comment"]
+
+    if comment != html.escape(comment, quote=True):
+        return Response("No XSS please", 400)
+
+    cur = get_db().cursor()
+
+    cur.execute("INSERT INTO Posts (username, comment, pattern, creation_time) VALUES (?, ?, ?, ?)", (username, comment, pattern.to_json_str(), int(time.time())))
+
+    get_db().commit()
+    cur.close()
+
+    return "success"
+
 @app.route("/change_username", methods=["POST"])
 @login_required
 def change_username():
     username = flask_login.current_user.id
 
     if request.form["new_username"] != html.escape(request.form["new_username"], quote=True):
-        return "No XSS please"
+        return Response("No XSS please", 400)
 
     new_username = html.escape(request.form["new_username"], quote=True)
 
