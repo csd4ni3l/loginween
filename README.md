@@ -1,6 +1,6 @@
 LoginWeen is an app where you login/register with a halloween pumpkin carving as a password.
 
-Live Demo (coming soon!): https://loginween.csd4ni3l.hu
+Live Demo: https://loginween.csd4ni3l.hu
 
 # Install
 

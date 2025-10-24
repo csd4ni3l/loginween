@@ -1,11 +1,11 @@
-function draw(e, ctx, CELL_SIZE, drawing, canvas, currentPattern) {
+function draw(e, ctx, CELL_SIZE, drawing, canvas, currentPattern, lit) {
     if (!drawing) return;
     var rect = canvas.getBoundingClientRect();
     var x = e.clientX - rect.left;
     var y = e.clientY - rect.top;
     var gridX = Math.floor(x / CELL_SIZE);
     var gridY = Math.floor(y / CELL_SIZE);
-    check_and_color(ctx, CELL_SIZE, currentPattern, gridX, gridY);
+    check_and_color(ctx, CELL_SIZE, currentPattern, lit, gridX, gridY);
 }
 
 function clearCanvas(ctx, canvas, img, GRID_SIZE, currentPattern) {
@@ -58,15 +58,13 @@ function check_colorable(image_data, canvas_width, CELL_SIZE, gridX, gridY) {
     const bottomLeft = getPixel(image_data, canvas_width, cellX + offset, cellY + CELL_SIZE - offset);
     const bottomRight = getPixel(image_data, canvas_width, cellX + CELL_SIZE - offset, cellY + CELL_SIZE - offset);
 
-    console.log(topLeft, topRight, bottomLeft, bottomRight)
-
     return is_orange(topLeft.r, topLeft.g) &&
            is_orange(topRight.r, topRight.g) &&
            is_orange(bottomLeft.r, bottomLeft.g) &&
            is_orange(bottomRight.r, bottomRight.g);
 }
 
-function check_and_color(ctx, CELL_SIZE, currentPattern, gridX, gridY, image_data = null) {
+function check_and_color(ctx, CELL_SIZE, currentPattern, lit, gridX, gridY, image_data = null) {
     if (!image_data) {
         image_data = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
     }
@@ -77,7 +75,13 @@ function check_and_color(ctx, CELL_SIZE, currentPattern, gridX, gridY, image_dat
             currentPattern.push(key);
             var cellX = gridX * CELL_SIZE;
             var cellY = gridY * CELL_SIZE;
-            ctx.clearRect(cellX, cellY, CELL_SIZE, CELL_SIZE);
+            if (!lit) {
+                ctx.clearRect(cellX, cellY, CELL_SIZE, CELL_SIZE);
+            }
+            else {
+                ctx.fillStyle = "yellow"
+                ctx.fillRect(cellX, cellY, CELL_SIZE, CELL_SIZE);
+            }
             return true;
         } else {
             return false;
@@ -87,50 +91,8 @@ function check_and_color(ctx, CELL_SIZE, currentPattern, gridX, gridY, image_dat
     return false;
 }
 
-function includesPoint(arr, [x, y]) {
-    return arr.some(([a, b]) => a === x && b === y);
-}
-
-function color_amount(ctx, canvas, grid_size, amount) {
-    let colored = 0;
-    const cell_size = canvas.width / grid_size;
-    let currentPattern = [];
-    
-    const image_data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-
-    for (let y = 0; y < grid_size; y++) {
-        for (let x = 0; x < grid_size; x++) {
-            if (colored == amount) {
-                return currentPattern;
-            }
-            if (check_and_color(ctx, cell_size, currentPattern, x, y, image_data)) {
-                colored++;
-            }
-        }
-    }
-    
-    return currentPattern;
-}
-
-function draw_pattern(ctx, canvas, pattern, grid_size) {
-    const cell_size = canvas.width / grid_size;
-    let currentPattern = [];
-    
-    const image_data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-
-    for (let x = 0; x < grid_size; x++) {
-        for (let y = 0; y < grid_size; y++) {
-            if (includesPoint(pattern, [x, y])) {
-                check_and_color(ctx, cell_size, currentPattern, x, y, image_data);
-            }
-        }
-    }
-    
-    return currentPattern;
-}
-
 function get_colorable(ctx, canvas, grid_size) {
-    let colorable = 0;
+    let pattern = [];
     const cell_size = canvas.width / grid_size;
 
     const image_data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
@@ -138,33 +100,71 @@ function get_colorable(ctx, canvas, grid_size) {
     for (let y = 0; y < grid_size; y++) {
         for (let x = 0; x < grid_size; x++) {
             if (check_colorable(image_data, canvas.width, cell_size, x, y)) {
-                colorable++;
+                var key = `${x},${y}`;
+                pattern.push(key);
             }
         }
     }
 
-    return colorable;
+    return pattern;
 }
 
-function setup_pumpkin(canvas_id, clearbtn_id, form_id, pattern_field_id, grid_size, allow_drawing=true) {
+function light_pumpkin(ctx, cell_size, currentPattern) {
+    for (const str of currentPattern) {
+        const [x, y] = str.split(",").map(s => parseInt(s.trim(), 10));
+        
+        var cellX = x * cell_size;
+        var cellY = y * cell_size;
+
+        ctx.fillStyle = "yellow"
+        ctx.fillRect(cellX, cellY, cell_size, cell_size);
+    }
+}
+
+function unlight_pumpkin(ctx, cell_size, currentPattern) {
+    for (const str of currentPattern) {
+        const [x, y] = str.split(",").map(s => parseInt(s.trim(), 10));
+        
+        var cellX = x * cell_size;
+        var cellY = y * cell_size;
+
+        ctx.clearRect(cellX, cellY, cell_size, cell_size)
+    }
+}
+
+function setup_pumpkin(canvas_id, clearbtn_id, lightbtn_id, form_id, pattern_field_id, grid_size, allow_drawing=true) {
     const canvas = document.getElementById(canvas_id);
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.src = '/static/pumpkin.png';
     const GRID_SIZE = grid_size;
     const CELL_SIZE = canvas.width / GRID_SIZE;
+    
     let currentPattern = [];
     
     img.onload = () => {
         clearCanvas(ctx, canvas, img, GRID_SIZE, currentPattern);
     };
-    
+
     if (allow_drawing) {
+        let lit = false;
+        document.getElementById(lightbtn_id).addEventListener('click', function(event) {
+            if (lit) {
+                lit = false;
+                unlight_pumpkin(ctx, CELL_SIZE, currentPattern);
+            } 
+            else {
+                lit = true;
+                light_pumpkin(ctx, CELL_SIZE, currentPattern);
+            }
+        });
+
         let drawing = false;
         canvas.addEventListener('mousedown', () => { drawing = true; });
         canvas.addEventListener('mouseup', () => { drawing = false; });
-        canvas.addEventListener('mousemove', (e) => draw(e, ctx, CELL_SIZE, drawing, canvas, currentPattern));
-        canvas.addEventListener('click', (e) => {draw(e, ctx, CELL_SIZE, true, canvas, currentPattern)});
+        canvas.addEventListener('mousemove', (e) => draw(e, ctx, CELL_SIZE, drawing, canvas, currentPattern, lit));
+        canvas.addEventListener('click', (e) => {draw(e, ctx, CELL_SIZE, true, canvas, currentPattern, lit)});
+        
         document.getElementById(clearbtn_id).addEventListener('click', () => clearCanvas(ctx, canvas, img, GRID_SIZE, currentPattern));
         document.getElementById(form_id).addEventListener('submit', function(event) {
             document.getElementById(pattern_field_id).value = JSON.stringify(currentPattern);

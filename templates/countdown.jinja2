@@ -39,13 +39,15 @@
     <div class="mt-3"></div>
     <h3 id="visualization_info">Carved Pumpkin Countdown Visualization (last ? days to Halloween):</h3>
     <canvas id="pumpkin_canvas" width="600" height="600"></canvas>
+    <button type="button" id="lightBtn" class="btn btn-warning">Light!</button>
 </div>
 
 <script>
 const halloween_countdown = document.getElementById("halloween_countdown");
-const [ctx, canvas, img] = setup_pumpkin("pumpkin_canvas", null, null, null, 15, false);
-let colorable = 0;
+const [ctx, canvas, img] = setup_pumpkin("pumpkin_canvas", null, null, null, null, 15, false);
+let pattern = [];
 let last_days = -1;
+const CELL_SIZE = canvas.width / 15;
 
 function update() {
     const current_time = new Date();
@@ -71,23 +73,35 @@ function update() {
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
     const seconds = Math.floor((diff / 1000) % 60);
     
-    if (days <= colorable && days != last_days) {
+    if (days <= pattern.length && days != last_days) {
         last_days = days;
         clearCanvas(ctx, canvas, img, 15, []);
-        color_amount(ctx, canvas, 15, colorable - days);
+        unlight_pumpkin(ctx, CELL_SIZE, pattern.slice(0, pattern.length - days));
     }
 
     halloween_countdown.textContent = `Time to next Halloween: ${days} day(s) ${hours} hour(s) ${minutes} minute(s) ${seconds} second(s)`
 }
 
 img.addEventListener('load', function() {
-    colorable = get_colorable(ctx, canvas, 15);
-    document.getElementById("visualization_info").textContent = `Carved Pumpkin Countdown Visualization (last ${colorable} days to Halloween):`
+    pattern = get_colorable(ctx, canvas, 15);
+    document.getElementById("visualization_info").textContent = `Carved Pumpkin Countdown Visualization (last ${pattern.length} days to Halloween):`
     imageLoaded = true;
     update();
     setInterval(update, 1500);
 });
 
+
+let lit = false;
+document.getElementById("lightBtn").addEventListener('click', function(event) {
+    if (lit) {
+        lit = false;
+        unlight_pumpkin(ctx, CELL_SIZE, pattern.slice(0, pattern.length - last_days));
+    } 
+    else {
+        lit = true;
+        light_pumpkin(ctx, CELL_SIZE, pattern.slice(0, pattern.length - last_days));
+    }
+});
 </script>
 
 {% endblock body %}
