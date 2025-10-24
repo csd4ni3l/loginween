@@ -1,10 +1,11 @@
-from flask import Flask, Response, render_template, redirect, url_for, g, request
+from flask import Flask, Response, render_template, redirect, url_for, g, request, json
 
 from flask_login import LoginManager, login_required
+from datetime import datetime
 
 from pattern import Pattern
 
-import sqlite3, os, flask_login, dotenv, secrets
+import sqlite3, os, flask_login, dotenv, secrets, html
 
 if os.path.exists(".env"):
     dotenv.load_dotenv(".env")
@@ -31,8 +32,8 @@ def get_db():
 
         db.execute("""
             CREATE TABLE IF NOT EXISTS Posts (
-                id INTEGER PRIMARY KEY,
-                username TEXT NOT NULL UNIQUE,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
                 comment TEXT NOT NULL,
                 pattern TEXT NOT NULL,
                 creation_time INTEGER NOT NULL
@@ -69,13 +70,23 @@ def main():
 
     cur = get_db().cursor()
 
-    cur.execute("SELECT * FROM Posts LIMIT 20")
+    cur.execute("SELECT * FROM Posts LIMIT 15")
 
     posts = cur.fetchall()
 
     cur.close()
 
-    return render_template("index.jinja2", username=username, posts=posts)
+    for post in posts:
+        if not isinstance(post[0], int):
+            print("Post ID is not int. Exiting for safety.")
+            return "Post ID is not int. Exiting for safety."
+        if not isinstance(post[4], int):
+            print("Post Timestamp is not int. Exiting for safety.")
+            return "Post Timestamp is not int. Exiting for safety."
+
+    new_posts = [[post[0], html.escape(post[1], quote=True), html.escape(post[2], quote=True), [html.escape(f"{pos[0]},{pos[1]}", quote=True) for pos in json.loads(post[3])], datetime.fromtimestamp(post[4]).strftime('%Y-%m-%d %H:%M:%S')] for post in posts]
+
+    return render_template("index.jinja2", username=username, posts=new_posts, grid_size=os.getenv("GRID_SIZE", 15))
 
 @app.route("/countdown")
 def countdown():
@@ -120,7 +131,10 @@ def register():
         return render_template("register.jinja2", grid_size=os.getenv("GRID_SIZE", 15))
     
     elif request.method == "POST":
-        username = request.form["username"]
+        if request.form["username"] != html.escape(request.form["username"], quote=True):
+            return "No XSS please"
+
+        username = html.escape(request.form["username"], quote=True)
         pattern = Pattern.from_str(request.form["pattern"])
 
         cur = get_db().cursor()

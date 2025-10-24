@@ -18,15 +18,40 @@
 {% endblock %}
 
 {% block body %}
-<div class="position-absolute top-50 start-50 translate-middle text-center">
-    {% for post in posts %}
-    <div class="card" style="width: 18rem;">
-        <canvas class="card-img-top"></canvas>
-        <div class="card-body">
-            <h5 class="card-title">{{ post.1 }}: {{ post.3 }}</h5>
-            <p class="card-text">{{ post.2 }}</p>
-        </div>
-    </div>
-    {% endfor %}
+<div class="text-center mt-3">
+    <h1>Posts</h1>
 </div>
+<div class="container mt-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for post in posts %}
+        <div class="col">
+            <div class="card h-100">
+                <canvas id="pumpkin-canvas-{{ post.0 }}" width="600" height="600" class="card-img-top"></canvas>
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.2 }}</h5>
+                    <p class="card-text">By: {{ post.1 }}<br>Created at: {{ post.4 }}</p>
+                    <button type="button" id="lightBtn-{{ post.0 }}" class="btn btn-warning">Light!</button>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+
+<script>
+let CELL_SIZE = 0;
+
+{% for post in posts %}
+const [ctx_{{ post.0 }}, canvas_{{ post.0 }}, img_{{ post.0 }}] = setup_pumpkin("pumpkin-canvas-{{ post.0 }}", null, null, null, null, {{ grid_size }}, false);
+let lit_{{ post.0 }} = false;
+let pattern_{{ post.0 }} = {{ post.3 }};
+
+CELL_SIZE = canvas_{{ post.0 }}.width / 15;
+
+img_{{ post.0 }}.addEventListener('load', function() {
+    unlight_pumpkin(ctx_{{ post.0 }}, CELL_SIZE, pattern_{{ post.0 }});
+});
+setup_lightbtn(ctx_{{ post.0 }}, CELL_SIZE, "lightBtn-{{ post.0 }}", pattern_{{ post.0 }})
+{% endfor %}
+</script>
 {% endblock body %}

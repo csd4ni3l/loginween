@@ -90,18 +90,7 @@ img.addEventListener('load', function() {
     setInterval(update, 1500);
 });
 
-
-let lit = false;
-document.getElementById("lightBtn").addEventListener('click', function(event) {
-    if (lit) {
-        lit = false;
-        unlight_pumpkin(ctx, CELL_SIZE, pattern.slice(0, pattern.length - last_days));
-    } 
-    else {
-        lit = true;
-        light_pumpkin(ctx, CELL_SIZE, pattern.slice(0, pattern.length - last_days));
-    }
-});
+setup_lightbtn(ctx, CELL_SIZE, "lightBtn", pattern.slice(0, pattern.length - last_days));
 </script>
 
 {% endblock body %}

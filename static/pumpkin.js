@@ -151,6 +151,23 @@ function unlight_pumpkin(ctx, cell_size, currentPattern) {
     }
 }
 
+function setup_lightbtn(ctx, cell_size, lightbtn_id, pattern) {
+    let lit = { value: false };
+    
+    document.getElementById(lightbtn_id).addEventListener('click', function(event) {
+        if (lit.value) {
+            lit.value = false;
+            unlight_pumpkin(ctx, cell_size, pattern);
+        } 
+        else {
+            lit.value = true;
+            light_pumpkin(ctx, cell_size, pattern);
+        }
+    });
+
+    return lit;
+}
+
 function setup_pumpkin(canvas_id, clearbtn_id, lightbtn_id, form_id, pattern_field_id, grid_size, allow_drawing=true) {
     const canvas = document.getElementById(canvas_id);
     const ctx = canvas.getContext('2d');
@@ -160,29 +177,20 @@ function setup_pumpkin(canvas_id, clearbtn_id, lightbtn_id, form_id, pattern_fie
     const CELL_SIZE = canvas.width / GRID_SIZE;
     
     let currentPattern = [];
+    let lit = { value: false };
     
     img.onload = () => {
         clearCanvas(ctx, canvas, img, GRID_SIZE, currentPattern);
     };
 
     if (allow_drawing) {
-        let lit = false;
-        document.getElementById(lightbtn_id).addEventListener('click', function(event) {
-            if (lit) {
-                lit = false;
-                unlight_pumpkin(ctx, CELL_SIZE, currentPattern);
-            } 
-            else {
-                lit = true;
-                light_pumpkin(ctx, CELL_SIZE, currentPattern);
-            }
-        });
+        lit = setup_lightbtn(ctx, CELL_SIZE, lightbtn_id, currentPattern);
 
         let drawing = false;
         canvas.addEventListener('mousedown', () => { drawing = true; });
         canvas.addEventListener('mouseup', () => { drawing = false; });
-        canvas.addEventListener('mousemove', (e) => draw(e, ctx, CELL_SIZE, drawing, canvas, currentPattern, lit));
-        canvas.addEventListener('click', (e) => {draw(e, ctx, CELL_SIZE, true, canvas, currentPattern, lit)});
+        canvas.addEventListener('mousemove', (e) => draw(e, ctx, CELL_SIZE, drawing, canvas, currentPattern, lit.value));
+        canvas.addEventListener('click', (e) => {draw(e, ctx, CELL_SIZE, true, canvas, currentPattern, lit.value)});
         
         document.getElementById(clearbtn_id).addEventListener('click', () => clearCanvas(ctx, canvas, img, GRID_SIZE, currentPattern));
         document.getElementById(form_id).addEventListener('submit', function(event) {
