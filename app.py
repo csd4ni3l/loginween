@@ -166,7 +166,10 @@ def profile_external(username):
 def change_username():
     username = flask_login.current_user.id
 
-    new_username = request.form["new_username"]
+    if request.form["new_username"] != html.escape(request.form["new_username"], quote=True):
+        return "No XSS please"
+
+    new_username = html.escape(request.form["new_username"], quote=True)
 
     cur = get_db().cursor()
 
