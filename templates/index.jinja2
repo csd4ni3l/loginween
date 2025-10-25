@@ -62,7 +62,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </form>
         </div>
@@ -95,6 +95,7 @@ document.getElementById('modal-form').addEventListener('submit', function(e) {
         method: 'POST',
         body: formData
     }).then(response => {
+        bootstrap.Modal.getInstance(document.getElementById('createPostModal')).hide();
         location.reload();
     })
     .catch(error => {
