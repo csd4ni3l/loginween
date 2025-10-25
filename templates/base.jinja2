@@ -8,12 +8,42 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
         <script src="/static/pumpkin.js"></script>
         <title>{% block title %} {% endblock %}</title>
+        <style>
+            .spider-web-1 {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 100px;
+                height: 100px;
+                opacity: 0.3;
+                pointer-events: none;
+                z-index: 1;
+            }
+            .spider-web-2 {
+                position: fixed;
+                left: 0;
+                bottom: 0;
+                width: 100px;
+                height: 100px;
+                opacity: 0.3;
+                pointer-events: none;
+                z-index: 1;
+            }
+            * {
+                font-family: 'Creepster', cursive !important;
+            }
+
+            body {
+                background: linear-gradient(135deg, #0d0618 0%, #1a0b2e 50%, #2d1b4e 100%);
+            }
+        </style>
+        <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
         {% block head %} {% endblock %}
     </head>
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/">LoginWeen</a>
+                <a class="navbar-brand" href="/" style="font-size: 2rem; font-family: 'Creepster', cursive; color: orange;">🎃 LoginWeen</a>
                 
                 <button class="navbar-toggler" type="button", data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -27,6 +57,20 @@
                 </div>
             </div>
         </nav>
+        <svg class="spider-web-1" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100,10 L100,190 M10,100 L190,100 M30,30 L170,170 M170,30 L30,170" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="100" cy="100" r="20" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="100" cy="100" r="40" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="100" cy="100" r="60" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="100" cy="100" r="80" stroke="white" stroke-width="2" fill="none"/>
+        </svg>
+        <svg class="spider-web-2" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100,10 L100,190 M10,100 L190,100 M30,30 L170,170 M170,30 L30,170" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="100" cy="100" r="20" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="100" cy="100" r="40" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="100" cy="100" r="60" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="100" cy="100" r="80" stroke="white" stroke-width="2" fill="none"/>
+        </svg>
         {% block body %}
         {% endblock %}
    </body>

@@ -192,6 +192,7 @@ def change_username():
     cur = get_db().cursor()
 
     cur.execute("UPDATE Users SET username = ? WHERE username = ?", (new_username, username))
+    cur.execute("UPDATE Posts SET username = ? WHERE username = ?", (new_username, username))
 
     get_db().commit()
     cur.close()
@@ -234,6 +235,7 @@ def delete_account():
     cur = get_db().cursor()
 
     cur.execute("DELETE FROM Users WHERE username = ?", (username,))
+    cur.execute("DELETE FROM Posts WHERE username = ?", (username,))
 
     get_db().commit()
     cur.close()
