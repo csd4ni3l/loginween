@@ -121,6 +121,8 @@ def login():
             flask_login.login_user(user, remember=True)
 
             return redirect(url_for("main"))
+        else:
+            return Response("Incorrect pattern.", 403)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
