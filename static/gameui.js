@@ -1,19 +1,14 @@
-function create_button(x, y, w, h, label_text, bg, text_color, on_click) {
-    let button = add([
-        rect(w, h), 
-        pos(x, y),
-        bg,
-        area(),
-    ]);
-
-    button.add([
-        text(label_text, {
-            width: w / 1.5,
-            size: 28,
-        }),
-        text_color,
-        pos(w / 2 - (label_text.length * 8), h / 2 - 18)
-    ]);
+function setup_button(button, on_click, label_text, text_color, w, h) {
+    if (label_text != null) {
+        button.add([
+            text(label_text, {
+                width: w / 1.5,
+                size: 28,
+            }),
+            text_color,
+            pos(w / 2 - (label_text.length * 8), h / 2 - 18)
+        ]);
+    }
 
     button.onClick(on_click);
     button.onHover(() => {
@@ -28,6 +23,26 @@ function create_button(x, y, w, h, label_text, bg, text_color, on_click) {
     
 
     return button;
+}
+
+function create_button(x, y, w, h, label_text, bg, text_color, on_click) {
+    let button = add([
+        rect(w, h), 
+        pos(x, y),
+        bg,
+        area(),
+    ]);
+    return setup_button(button, on_click, label_text, text_color, w, h);
+}
+
+function create_texturebutton(x, y, image_name, on_click) {
+    let button = add([
+        sprite(image_name), 
+        pos(x, y),
+        area(),
+    ]);
+
+    return setup_button(button, on_click);
 }
 
 function create_slider(x, y, w, min_val, max_val, initial_val, on_change) {
