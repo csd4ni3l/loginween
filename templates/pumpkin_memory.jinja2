@@ -1,0 +1,39 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Test Game{% endblock title %}
+
+{% block nav %}
+<li class="nav-item">
+    <a class="nav-link" href="/">Home</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" aria-current="page" href="/pumpkin_memory">Pumpkin Memory</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/countdown">Countdown</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/profile">Profile</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/logout">Logout</a>
+</li>
+{% endblock %}
+
+{% block body %}
+
+<div class="position-absolute top-50 start-50 translate-middle text-center">
+    <div id="game-container">
+        <canvas width="1280", height="720" id="canvas"></canvas>
+    </div>
+</div>
+
+<script src="/static/gameui.js"></script>
+<script src="/static/game.js"></script>
+<script src="/static/pumpkin_memory.js"></script>
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+    start_game("Pumpkin Memory");
+});
+</script>
+{% endblock %}
