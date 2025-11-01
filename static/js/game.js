@@ -6,7 +6,7 @@ function change_setting(category, setting, value) {
     go("settings", category);
 }
 
-function show_settings(category) {
+function show_settings(category, SETTINGS) {
     const x = 400;
     const label_x = 50;
     const space_between = 100;
@@ -99,10 +99,10 @@ function start_game() {
         horizontal_buttons(10, 10, generated_button_lists, 200, 75, 10);
 
         if (setting_category != null) {
-            show_settings(setting_category);
+            show_settings(setting_category, SETTINGS);
         }
         else {
-            show_settings(Object.keys(SETTINGS)[0]);
+            show_settings(Object.keys(SETTINGS)[0], SETTINGS);
         }
     })
 

@@ -1,5 +1,6 @@
 function setup_game() {
-    loadSprite("pumpkin", "/static/pumpkin.png");
+    loadSprite("pumpkin", "/static/graphics/pumpkin.png");
+    loadSprite("gravestone", "/static/gravestone.png")
     const SETTINGS = {
         "Graphics": {
             "Anti-Aliasing": {"type": "bool", "default": true},

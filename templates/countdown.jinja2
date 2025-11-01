@@ -57,7 +57,7 @@ function update() {
     let year = current_time.getFullYear();
 
     const halloween_time = new Date(year, 9, 31);
-    const after_halloween = new Date(year, 15, 1);
+    const after_halloween = new Date(year, 10, 1);
 
     if (current_time > halloween_time) {
         if (current_time < after_halloween) {
@@ -65,7 +65,7 @@ function update() {
             return;
         }
         else {
-            halloween.setFullYear(year + 1);
+            halloween_time.setFullYear(year + 1);
         }
     }
 

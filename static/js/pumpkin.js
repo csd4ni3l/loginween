@@ -171,7 +171,7 @@ function setup_pumpkin(canvas_id, clearbtn_id, lightbtn_id, form_id, pattern_fie
     const canvas = document.getElementById(canvas_id);
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    img.src = '/static/pumpkin.png';
+    img.src = '/static/graphics/pumpkin.png';
     const GRID_SIZE = grid_size;
     const CELL_SIZE = canvas.width / GRID_SIZE;
     
