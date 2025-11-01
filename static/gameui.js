@@ -45,6 +45,15 @@ function create_texturebutton(x, y, image_name, on_click) {
     return setup_button(button, on_click);
 }
 
+function create_sprite(x, y, image_name) {
+    let image_sprite = add([
+        sprite(image_name),
+        pos(x, y)
+    ])
+
+    return image_sprite;
+}
+
 function create_slider(x, y, w, min_val, max_val, initial_val, on_change) {
     const slider_height = 15;
     const handle_size = 30;

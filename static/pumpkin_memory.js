@@ -1,6 +1,6 @@
 loadSprite("pumpkin", "/static/pumpkin.png")
 
-scene("game", (pumpkin_pairs) => {
+scene("game", (pumpkin_pairs, pumpkin_array, revealed, found_pairs, start) => {
     create_button(5, 5, 150, 75, "Back", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("main_menu"))
 
     const total = pumpkin_pairs * 2;
@@ -23,20 +23,82 @@ scene("game", (pumpkin_pairs) => {
     const start_x = (WIDTH - grid_width) / 2;
     const start_y = (HEIGHT - grid_height) / 2;
 
-    let arr = [...Array(pumpkin_pairs).keys(), ...Array(pumpkin_pairs).keys()];
+    let arr;
+    if (pumpkin_array == null) {
+        arr = [...Array(pumpkin_pairs).keys(), ...Array(pumpkin_pairs).keys()];
 
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
     }
+    else {
+        arr = pumpkin_array;
+    }
+
+    if (revealed == null) {
+        revealed = [];
+        found_pairs = [];
+        start = performance.now();
+    }
+
+    let found_pair = null;
+    if (arr[revealed[0]] == arr[revealed[1]] && !found_pairs.includes(arr[revealed[0]])) {
+        found_pair = arr[revealed[0]];
+        found_pairs.push(arr[revealed[0]]);
+        revealed = [];
+    }
+
+    if (revealed.length > 2) {
+        revealed = [];
+    }
+    
+    if (pumpkin_pairs == found_pairs.length - 1) {
+        create_label(520, 320, `You win!\nTime took: ${(elapsed / 1000).toFixed(1)} s`, 48);
+        return;
+    }
+
+    const elapsed = performance.now() - start;
+    const timer_label = create_label(520, 5, `Time spent: ${(elapsed / 1000).toFixed(1)} s`);
+    const timer_interval_id = setInterval(() => {
+        const elapsed = performance.now() - start;
+        timer_label.text = `Time spent: ${(elapsed / 1000).toFixed(1)} s`
+    }, 100);
 
     for (let i = 0; i < arr.length; i++) {
         let row =  Math.floor(i / cols);
         let col = i % cols;
+        let index = i;
 
-        create_texturebutton(start_x + (col * (pumpkin_size + space_between)), start_y + (row * (pumpkin_size + space_between)), "pumpkin", () => {
-            
-        });
+        if (revealed.includes(i)) {
+            const sprite = create_sprite(start_x + col * (pumpkin_size + space_between), start_y + row * (pumpkin_size + space_between), "pumpkin");
+            sprite.scale = 1;
+            tween(sprite.scale, 0, 0.2, (val) => sprite.scale = val).then(() => {
+                create_label(start_x + col * (pumpkin_size + space_between) + pumpkin_size / 2, start_y + row * (pumpkin_size + space_between) + pumpkin_size / 2, arr[i], 24);
+                tween(sprite.scale, 1, 0.2, (val) => sprite.scale = val).then(() => {
+                    wait(0.5, () => {
+                        if (found_pair == null) {
+                            clearInterval(timer_interval_id);
+                            go("game", pumpkin_pairs, arr, [], found_pairs, start);
+                        }
+                        else {
+                            destroy(sprite);
+                        }
+                    });
+                });
+            })
+        } else if (found_pairs.includes(arr[i])) {
+            const sprite = create_sprite(start_x + col * (pumpkin_size + space_between), start_y + row * (pumpkin_size + space_between), "pumpkin");
+            sprite.opacity = 0.5;
+            create_label(start_x + col * (pumpkin_size + space_between) + pumpkin_size / 2, start_y + row * (pumpkin_size + space_between) + pumpkin_size / 2, arr[i], 24);
+        } else {
+            const btn = create_texturebutton(start_x + col * (pumpkin_size + space_between), start_y + row * (pumpkin_size + space_between), "pumpkin", () => {
+                btn.scale = 1.1;
+                tween(btn.scale, 1, 0.2, (val) => btn.scale = val);
+                clearInterval(timer_interval_id);
+                go("game", pumpkin_pairs, arr, revealed.concat([index]), found_pairs, start);
+            })
+        }
     }
 
 })
