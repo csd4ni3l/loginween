@@ -1,38 +1,6 @@
 const WIDTH = 1280;
 const HEIGHT = 720;
 
-const SETTINGS = {
-    "Graphics": {
-        "Anti-Aliasing": {"type": "bool", "default": true},
-        "Texture Filtering": {"type": "option", "options": ["Nearest", "Linear"], "default": "Linear"},
-        "VSync": {"type": "bool", "default": true},
-        "FPS Limit": {"type": "slider", "min": 0, "max": 480, "default": 60},
-    },
-    "Sound": {
-        "Music": {"type": "bool", "default": true},
-        "SFX": {"type": "bool", "default": true},
-        "Music Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
-        "SFX Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
-    }
-}
-
-kaplay(
-    { 
-        width: WIDTH,
-        height: HEIGHT,
-        canvas: document.getElementById("canvas"),
-        root: document.getElementById("game-container"),
-        font: "New Rocker",
-        background: "#e18888",
-        buttons: {
-            up_: {
-                keyboard: "up",
-                gamepad: "south", 
-            },
-        }
-    }
-);
-
 function change_setting(category, setting, value) {
     localStorage.setItem(setting, value);
     go("settings", category);
@@ -42,7 +10,15 @@ function show_settings(category) {
     const x = 400;
     const label_x = 50;
     const space_between = 100;
-    let y = 130;
+    let y;
+
+    if (category == "Graphics") {
+        y = 130 + space_between;
+        create_label(label_x, y - space_between, "These settings need a page reload to take effect!", 32);
+    }
+    else {
+        y = 130;
+    }
     
     for (let key in SETTINGS[category]) {
         const settings_dict = SETTINGS[category][key];
@@ -80,8 +56,8 @@ function show_settings(category) {
             });
         }
         else if (settings_dict.type == "slider") {
-            create_slider(x, y, 400, Number(settings_dict.min), Number(settings_dict.max), Number(value), () => {
-                localStorage.setItem(currentKey, value);
+            create_slider(x, y, 400, Number(settings_dict.min), Number(settings_dict.max), Number(value), (new_value) => {
+                localStorage.setItem(currentKey, new_value);
             });
         }
         
@@ -89,7 +65,33 @@ function show_settings(category) {
     }
 }
 
-function start_game(title) {
+function start_game() {
+    kaplay(
+        { 
+            width: WIDTH,
+            height: HEIGHT,
+            canvas: document.getElementById("canvas"),
+            root: document.getElementById("game-container"),
+            crisp: !localStorage.getItem("Anti-Alasing"),
+            texFilter: localStorage.getItem("Texture Filtering").toLowerCase(),
+            maxFPS: Number(localStorage.getItem("FPS Limit")),
+            font: "New Rocker",
+            background: "#e18888",
+            buttons: {
+                up: {
+                    keyboard: "up",
+                    gamepad: "south", 
+                },
+                jump: {
+                    keyboard: "space",
+                    gamepad: "a"
+                }
+            }
+        }
+    );
+
+    const [GAME_TITLE, SETTINGS] = setup_game();
+
     scene("settings", (setting_category) => {
         let generated_button_lists = Object.entries(SETTINGS).map(([key, value]) => [key, color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("settings", key)]);
         generated_button_lists = [["Back", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("main_menu")]].concat(generated_button_lists);
@@ -105,7 +107,7 @@ function start_game(title) {
     })
 
     scene("main_menu", () => {
-        create_label(WIDTH / 2 - 16 * title.length, HEIGHT / 4, title, 56);
+        create_label(WIDTH / 2 - 16 * GAME_TITLE.length, HEIGHT / 4, GAME_TITLE, 56);
         vertical_buttons(WIDTH / 4, HEIGHT / 2.25, [["Play", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("play")], ["Settings", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("settings")]], WIDTH / 2, HEIGHT / 8, HEIGHT / 50)
     });
 
