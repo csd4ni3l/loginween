@@ -14,22 +14,21 @@ function setup_game() {
         },
     };
 
-    scene("game", (pumpkin_pairs, pumpkin_array, revealed, found_pairs, start) => {
+    scene("game", (difficulty, pumpkin_array, revealed, found_pairs, start) => {
         create_button(5, 5, 150, 75, "Back", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("main_menu"))
+
+        let cols;
+        switch (difficulty) {
+            case "easy": pumpkin_pairs = 5; cols = 5; break; 
+            case "medium": pumpkin_pairs = 10; cols = 4; break;
+            case "hard": pumpkin_pairs = 15; cols = 5; break;
+            case "extrahard": pumpkin_pairs = 20; cols = 10; break;
+        }
 
         const total = pumpkin_pairs * 2;
         const pumpkin_size = 100;
         const space_between = 10;
         
-        let cols;
-        switch (pumpkin_pairs) {
-            case 5: cols = 5; break; 
-            case 10: cols = 4; break;
-            case 15: cols = 5; break;
-            case 20: cols = 10; break;
-            default: cols = Math.ceil(Math.sqrt(pumpkin_pairs * 2));
-        }
-
         const rows = Math.ceil(total / cols);
         const grid_width = cols * (pumpkin_size + space_between) - space_between;
         const grid_height = rows * (pumpkin_size + space_between) - space_between;
@@ -88,7 +87,7 @@ function setup_game() {
             if ((elapsed / 1000).toFixed(1) < best_time) {
                 best_time = (elapsed / 1000).toFixed(1);
             }
-            localStorage.setItem(`memory_best_${pumpkin_pairs}`, best_time);
+            localStorage.setItem(`memory_best_${difficulty}`, best_time);
             
             create_label(520, 320, `You win!\nTime took: ${(elapsed / 1000).toFixed(1)} s Best Time: ${best_time_display}`, 48);
             return;
@@ -108,7 +107,7 @@ function setup_game() {
                         wait(0.5, () => {
                             if (found_pair == null) {
                                 clearInterval(timer_interval_id);
-                                go("game", pumpkin_pairs, arr, [], found_pairs, start);
+                                go("game", difficulty, arr, [], found_pairs, start);
                             }
                             else {
                                 destroy(sprite);
@@ -125,7 +124,7 @@ function setup_game() {
                     btn.scale = 1.1;
                     tween(btn.scale, 1, 0.2, (val) => btn.scale = val);
                     clearInterval(timer_interval_id);
-                    go("game", pumpkin_pairs, arr, revealed.concat([index]), found_pairs, start);
+                    go("game", difficulty, arr, revealed.concat([index]), found_pairs, start);
                 })
             }
         }
@@ -135,10 +134,10 @@ function setup_game() {
     scene("play", () => {
         create_label(WIDTH / 2 - 16 * "Difficulty Selector".length, HEIGHT / 8, "Difficulty Selector", 56);
         vertical_buttons(WIDTH / 4, HEIGHT / 4, [
-            ["Easy", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("game", 5)], 
-            ["Medium", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("game", 10)],
-            ["Hard", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("game", 15)],
-            ["Extra Hard", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("game", 20)]
+            ["Easy", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("game", "easy")], 
+            ["Medium", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("game", "medium")],
+            ["Hard", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("game", "hard")],
+            ["Extra Hard", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("game", "extrahard")]
         ], WIDTH / 2, HEIGHT / 8, HEIGHT / 50)
     });
 

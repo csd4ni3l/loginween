@@ -32,6 +32,11 @@
 
             {% if logged_in_account %}
                 <p class="mb-1">Logged in as: {{ username }}</p>
+                <p class="mb-1" id="pumpkin_roll_highscore">Pumpkin Roll High Score: Loading...</p>
+                <p class="mb-1" id="memory_best_easy">Pumpkin Memory (Easy) Best Time: Loading...</p>
+                <p class="mb-1" id="memory_best_medium">Pumpkin Memory (Medium) Best Time: Loading...</p>
+                <p class="mb-1" id="memory_best_hard">Pumpkin Memory (Hard) Best Time: Loading...</p>
+                <p class="mb-1" id="memory_best_extrahard">Pumpkin Memory (Extra hard) Best Time: Loading...</p>
             {% endif %}
         </div>
     </div>
@@ -93,7 +98,18 @@
 </div>
 
 <script>
-setup_pumpkin("current_pumpkin_canvas", "currentclearBtn", "currentlightBtn", "change_pattern_form", "current_pattern_field", {{ grid_size }})
-setup_pumpkin("new_pumpkin_canvas", "newclearBtn", "newlightBtn", "change_pattern_form", "new_pattern_field", {{ grid_size }})
+setup_pumpkin("current_pumpkin_canvas", "currentclearBtn", "currentlightBtn", "change_pattern_form", "current_pattern_field", {{ grid_size }});
+setup_pumpkin("new_pumpkin_canvas", "newclearBtn", "newlightBtn", "change_pattern_form", "new_pattern_field", {{ grid_size }});
+
+pumpkin_roll_highscore = localStorage.getItem("pumpkin_roll_highscore") || "None"
+memory_best_easy = localStorage.getItem("memory_best_easy") || "None"
+memory_best_medium = localStorage.getItem("memory_best_medium") || "None"
+memory_best_hard = localStorage.getItem("memory_best_hard") || "None"
+memory_best_extrahard = localStorage.getItem("memory_best_extrahard") || "None"
+document.getElementById("pumpkin_roll_highscore").textContent = `Pumpkin Roll High Score: ${pumpkin_roll_highscore}`
+document.getElementById("memory_best_easy").textContent = `Pumpkin Memory (Easy) Best Time: ${memory_best_easy}`
+document.getElementById("memory_best_medium").textContent = `Pumpkin Memory (Medium) Best Time: ${memory_best_medium}`
+document.getElementById("memory_best_hard").textContent = `Pumpkin Memory (Hard) Best Time: ${memory_best_hard}`
+document.getElementById("memory_best_extrahard").textContent = `Pumpkin Memory (Extra Hard) Best Time: ${memory_best_extrahard}`
 </script>
 {% endblock body %}

@@ -1,11 +1,24 @@
-function spawn_enemy() {
-    let enemy_type = "tombstone";
-    const enemy_width = 140;
-    const enemy_height = 120;
+function spawn_enemy(enemy_type) {
+    let enemy_width;
+    let enemy_height;
+    let start_y;
+    if (enemy_type == "tombstone") {
+        scale_f = scale(0.05);
+        start_y = 720;
+        enemy_width = 140;
+        enemy_height = 120;
+    }
+    else {
+        scale_f = scale(0.5);
+        start_y = 600;
+        enemy_width = 148;
+        enemy_height = 147;
+    }
+
     const enemy_sprite = add([
         sprite(enemy_type),
-        pos(1280 - enemy_width, 720 - enemy_height),
-        scale(0.05),
+        pos(1280 - enemy_width, start_y - enemy_height),
+        scale_f,
         area(),
         "enemy"
     ]);
@@ -23,6 +36,8 @@ function spawn_enemy() {
 function setup_game() {
     loadSprite("pumpkin", "/static/graphics/pumpkin.png");
     loadSprite("tombstone", "/static/graphics/tombstone.png");
+    loadSprite("bird", "/static/graphics/bird.png");
+
     const SETTINGS = {
         "Graphics": {
             "Anti-Aliasing": {"type": "bool", "default": "true"},
@@ -47,7 +62,7 @@ function setup_game() {
         let score = 0;
         let high_score = localStorage.getItem("pumpkin_roll_highscore");
         let game_over = false;
-        let enemys = [];
+        let enemies = [];
         let last_enemy_spawn = performance.now();
 
         const score_label = create_label(480, 10, `Score: ${score} High Score: ${high_score}`);
@@ -73,21 +88,27 @@ function setup_game() {
             if (game_over) return;
             game_over = true;
 
-            for (let enemy of enemys) {
+            for (let enemy of enemies) {
                 destroy(enemy);
             }
 
             create_label(520, 320, `Game Over!\nScore: ${Math.floor(score)}\nHigh Score: ${high_score}`, 48);
         })
 
-        enemy_spawn_with_check = () => {
-            if (game_over) {
-                return
+        enemy_spawn_with_check = (count) => {
+            const enemy_type = Math.random() < 0.75 ? "tombstone" : "bird";
+            for (let i = 0; i < count; i++) {
+                if (game_over) {
+                    return
+                }
+                
+                setTimeout(() => {
+                    enemies.push(spawn_enemy(enemy_type));
+                }, i * 150);
             }
-            enemys.push(spawn_enemy())
         }
 
-        spawn_enemy();
+        enemy_spawn_with_check(1);
 
         pumpkin_sprite.onUpdate(() => {
             if (game_over) return;
@@ -104,16 +125,13 @@ function setup_game() {
                 last_enemy_spawn = performance.now();
                 const random = Math.random();
                 if (random < 0.2) {
-                    enemys.push(spawn_enemy());
-                    setTimeout(enemy_spawn_with_check, 150);
-                    setTimeout(enemy_spawn_with_check, 300);              
+                    enemy_spawn_with_check(3);           
                 }
                 else if (random < 0.5) {
-                    enemys.push(spawn_enemy());
-                    setTimeout(enemy_spawn_with_check, 150);  
+                    enemy_spawn_with_check(2);
                 }
                 else {
-                    enemys.push(spawn_enemy());
+                    enemy_spawn_with_check(1);
                 }
             }
 
@@ -122,10 +140,13 @@ function setup_game() {
                 pumpkin_sprite.isJumping = true;
             }
 
-            pumpkin_sprite.angle = (pumpkin_sprite.angle + dt() * 270) % 360;
-
-            if (!pumpkin_sprite.isJumping) return;
-
+            if (pumpkin_sprite.isJumping) {
+                pumpkin_sprite.angle = (pumpkin_sprite.angle + dt() * 360) % 360;
+            }
+            else {
+                pumpkin_sprite.angle = (pumpkin_sprite.angle + dt() * 180) % 360;
+                return;
+            }
             pumpkin_sprite.vy += GRAVITY * dt();
             pumpkin_sprite.pos.y += pumpkin_sprite.vy * dt();
 
