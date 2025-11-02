@@ -13,6 +13,9 @@
     <a class="nav-link" href="/pumpkin_memory">Pumpkin Memory</a>
 </li>
 <li class="nav-item">
+    <a class="nav-link" href="/whack_a_pumpkin">Whack a Pumpkin</a>
+</li>
+<li class="nav-item">
     <a class="nav-link" href="/countdown">Countdown</a>
 </li>
 <li class="nav-item">
@@ -33,6 +36,7 @@
             {% if logged_in_account %}
                 <p class="mb-1">Logged in as: {{ username }}</p>
                 <p class="mb-1" id="pumpkin_roll_highscore">Pumpkin Roll High Score: Loading...</p>
+                <p class="mb-1" id="whackapumpkin_highscore">Whack a Pumpkin High Score: Loading...</p>
                 <p class="mb-1" id="memory_best_easy">Pumpkin Memory (Easy) Best Time: Loading...</p>
                 <p class="mb-1" id="memory_best_medium">Pumpkin Memory (Medium) Best Time: Loading...</p>
                 <p class="mb-1" id="memory_best_hard">Pumpkin Memory (Hard) Best Time: Loading...</p>
@@ -101,15 +105,22 @@
 setup_pumpkin("current_pumpkin_canvas", "currentclearBtn", "currentlightBtn", "change_pattern_form", "current_pattern_field", {{ grid_size }});
 setup_pumpkin("new_pumpkin_canvas", "newclearBtn", "newlightBtn", "change_pattern_form", "new_pattern_field", {{ grid_size }});
 
+function formatTime(time) {
+    return time !== "None" ? `${time}s` : time;
+}
+
 pumpkin_roll_highscore = localStorage.getItem("pumpkin_roll_highscore") || "None"
+whackapumpkin_highscore = localStorage.getItem("whackapumpkin_highscore") || "None"
 memory_best_easy = localStorage.getItem("memory_best_easy") || "None"
 memory_best_medium = localStorage.getItem("memory_best_medium") || "None"
 memory_best_hard = localStorage.getItem("memory_best_hard") || "None"
 memory_best_extrahard = localStorage.getItem("memory_best_extrahard") || "None"
-document.getElementById("pumpkin_roll_highscore").textContent = `Pumpkin Roll High Score: ${pumpkin_roll_highscore}`
-document.getElementById("memory_best_easy").textContent = `Pumpkin Memory (Easy) Best Time: ${memory_best_easy}`
-document.getElementById("memory_best_medium").textContent = `Pumpkin Memory (Medium) Best Time: ${memory_best_medium}`
-document.getElementById("memory_best_hard").textContent = `Pumpkin Memory (Hard) Best Time: ${memory_best_hard}`
-document.getElementById("memory_best_extrahard").textContent = `Pumpkin Memory (Extra Hard) Best Time: ${memory_best_extrahard}`
+
+document.getElementById("pumpkin_roll_highscore").textContent = `Pumpkin Roll High Score: ${formatTime(pumpkin_roll_highscore)}`;
+document.getElementById("whackapumpkin_highscore").textContent = `Whack a Pumpkin High Score: ${formatTime(whackapumpkin_highscore)}`;
+document.getElementById("memory_best_easy").textContent = `Pumpkin Memory (Easy) Best Time: ${formatTime(memory_best_easy)}`;
+document.getElementById("memory_best_medium").textContent = `Pumpkin Memory (Medium) Best Time: ${formatTime(memory_best_medium)}`;
+document.getElementById("memory_best_hard").textContent = `Pumpkin Memory (Hard) Best Time: ${formatTime(memory_best_hard)}`;
+document.getElementById("memory_best_extrahard").textContent = `Pumpkin Memory (Extra Hard) Best Time: ${formatTime(memory_best_extrahard)}`;
 </script>
 {% endblock body %}

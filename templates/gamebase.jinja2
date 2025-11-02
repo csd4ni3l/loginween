@@ -1,0 +1,34 @@
+{% extends "base.jinja2" %}
+
+{% block nav %}
+<li class="nav-item">
+    <a class="nav-link" href="/">Home</a>
+</li>
+{% block gamenav %}{% endblock %}
+<li class="nav-item">
+    <a class="nav-link" href="/countdown">Countdown</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/profile">Profile</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/logout">Logout</a>
+</li>
+{% endblock %}
+
+{% block body %}
+<div class="position-absolute top-50 start-50 translate-middle text-center">
+    <h1>WIP!!! Not part of this week!!</h1>
+    <div id="game-container">
+        <canvas width="1280", height="720" id="canvas"></canvas>
+    </div>
+</div>
+<script src="/static/js/gameui.js"></script>
+<script src="/static/js/game.js"></script>
+{% block game_js %}{% endblock %}
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+    start_game();
+});
+</script>
+{% endblock %}

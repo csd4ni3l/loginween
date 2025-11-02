@@ -261,4 +261,9 @@ def pumpkin_memory():
 def pumpkin_roll():
     return render_template("pumpkin_roll.jinja2")
 
+@app.route("/whack_a_pumpkin")
+@login_required
+def whack_a_pumpkin():
+    return render_template("whack_a_pumpkin.jinja2")
+
 app.run(host=os.getenv("HOST", "0.0.0.0"), port=int(os.getenv("PORT", 8080)), debug=os.getenv("DEBUG_MODE", False).lower() == "true")

@@ -66,15 +66,17 @@ function show_settings(category, GAME_TITLE, SETTINGS) {
 }
 
 function start_game() {
+    const [GAME_TITLE, SETTINGS] = game_info();
+
     kaplay(
         { 
             width: WIDTH,
             height: HEIGHT,
             canvas: document.getElementById("canvas"),
             root: document.getElementById("game-container"),
-            crisp: !localStorage.getItem("Anti-Alasing"),
-            texFilter: (localStorage.getItem("Texture Filtering") || "nearest").toLowerCase(),
-            maxFPS: Number(localStorage.getItem("FPS Limit")),
+            crisp: !localStorage.getItem(`${GAME_TITLE} Anti-Aliasing`),
+            texFilter: (localStorage.getItem(`${GAME_TITLE} Texture Filtering`) || "nearest").toLowerCase(),
+            maxFPS: Number(localStorage.getItem(`${GAME_TITLE} FPS Limit`)),
             font: "New Rocker",
             background: "#e18888",
             buttons: {
@@ -90,8 +92,8 @@ function start_game() {
         }
     );
 
-    const [GAME_TITLE, SETTINGS] = setup_game();
-
+    setup_game();
+    
     scene("settings", (setting_category) => {
         let generated_button_lists = Object.entries(SETTINGS).map(([key, value]) => [key, color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("settings", key)]);
         generated_button_lists = [["Back", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("main_menu")]].concat(generated_button_lists);

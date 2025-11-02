@@ -1,5 +1,4 @@
-function setup_game() {
-    loadSprite("pumpkin", "/static/graphics/pumpkin.png");
+function game_info() {
     const SETTINGS = {
         "Graphics": {
             "Anti-Aliasing": {"type": "bool", "default": "true"},
@@ -13,6 +12,12 @@ function setup_game() {
             "SFX Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
         },
     };
+    
+    return ["Pumpkin Memory", SETTINGS];
+}
+
+function setup_game() {
+    loadSprite("pumpkin", "/static/graphics/pumpkin.png");
 
     scene("game", (difficulty, pumpkin_array, revealed, found_pairs, start) => {
         create_button(5, 5, 150, 75, "Back", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("main_menu"))
@@ -71,7 +76,7 @@ function setup_game() {
 
         const best_time_display = (best_time == 99999) ? "None" : `${best_time}s`;
         const elapsed = performance.now() - start;
-        const timer_label = create_label(520, 5, `Time spent: ${(elapsed / 1000).toFixed(1)}s Best Time: ${best_time_display}`);
+        const timer_label = create_label(400, 5, `Time spent: ${(elapsed / 1000).toFixed(1)}s Best Time: ${best_time_display}`);
 
         const timer_interval_id = setInterval(() => {
             const elapsed = performance.now() - start;
@@ -88,8 +93,9 @@ function setup_game() {
                 best_time = (elapsed / 1000).toFixed(1);
             }
             localStorage.setItem(`memory_best_${difficulty}`, best_time);
-            
-            create_label(520, 320, `You win!\nTime took: ${(elapsed / 1000).toFixed(1)} s Best Time: ${best_time_display}`, 48);
+
+            const best_time_display = (best_time == 99999) ? "None" : `${best_time}s`;
+            create_label(520, 320, `You win!\nTime took: ${(elapsed / 1000).toFixed(1)} s\nBest Time: ${best_time_display}`, 48);
             return;
         }
 
@@ -102,7 +108,7 @@ function setup_game() {
                 const sprite = create_sprite(start_x + col * (pumpkin_size + space_between), start_y + row * (pumpkin_size + space_between), "pumpkin");
                 sprite.scale = 1;
                 tween(sprite.scale, 0, 0.2, (val) => sprite.scale = val).then(() => {
-                    create_label(start_x + col * (pumpkin_size + space_between) + pumpkin_size / 2, start_y + row * (pumpkin_size + space_between) + pumpkin_size / 2, arr[i], 24);
+                    create_label(start_x + col * (pumpkin_size + space_between) + pumpkin_size / 3, start_y + row * (pumpkin_size + space_between) + pumpkin_size / 2, arr[i], 24);
                     tween(sprite.scale, 1, 0.2, (val) => sprite.scale = val).then(() => {
                         wait(0.5, () => {
                             if (found_pair == null) {
@@ -140,6 +146,4 @@ function setup_game() {
             ["Extra Hard", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("game", "extrahard")]
         ], WIDTH / 2, HEIGHT / 8, HEIGHT / 50)
     });
-
-    return ["Pumpkin Memory", SETTINGS];
 }

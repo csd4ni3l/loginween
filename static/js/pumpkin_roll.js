@@ -1,3 +1,24 @@
+function game_info() {
+    const SETTINGS = {
+        "Graphics": {
+            "Anti-Aliasing": {"type": "bool", "default": "true"},
+            "Texture Filtering": {"type": "option", "options": ["Nearest", "Linear"], "default": "Linear"},
+            "FPS Limit": {"type": "slider", "min": 0, "max": 480, "default": 60},
+        },
+        "Sound": {
+            "Music": {"type": "bool", "default": "true"},
+            "SFX": {"type": "bool", "default": "true"},
+            "Music Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
+            "SFX Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
+        },
+        "Input": {
+            "Controller Enabled": {"type": "bool", "default": "true"}
+        }
+    };
+    
+    return ["Pumpkin Roll", SETTINGS];
+}
+
 function spawn_enemy(enemy_type) {
     let enemy_width;
     let enemy_height;
@@ -38,39 +59,19 @@ function setup_game() {
     loadSprite("tombstone", "/static/graphics/tombstone.png");
     loadSprite("bird", "/static/graphics/bird.png");
 
-    const SETTINGS = {
-        "Graphics": {
-            "Anti-Aliasing": {"type": "bool", "default": "true"},
-            "Texture Filtering": {"type": "option", "options": ["Nearest", "Linear"], "default": "Linear"},
-            "FPS Limit": {"type": "slider", "min": 0, "max": 480, "default": 60},
-        },
-        "Sound": {
-            "Music": {"type": "bool", "default": "true"},
-            "SFX": {"type": "bool", "default": "true"},
-            "Music Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
-            "SFX Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
-        },
-        "Input": {
-            "Controller Enabled": {"type": "bool", "default": "true"}
-        }
-    };
     const GRAVITY = 2500;
     const JUMP_VELOCITY = -1200;
     const GROUND_Y = 670;
 
     scene("play", () => {
         let score = 0;
-        let high_score = localStorage.getItem("pumpkin_roll_highscore");
+        let high_score = Number(localStorage.getItem("pumpkin_roll_highscore"));
         let game_over = false;
         let enemies = [];
         let last_enemy_spawn = performance.now();
 
         const score_label = create_label(480, 10, `Score: ${score} High Score: ${high_score}`);
-
-        if (high_score == null) {
-            high_score = 0;
-        }
-
+        
         let pumpkin_sprite = add([
             sprite("pumpkin"),
             pos(50, 670),
@@ -157,6 +158,4 @@ function setup_game() {
             }
         });
     })
-
-    return ["Pumpkin Roll", SETTINGS];
 }

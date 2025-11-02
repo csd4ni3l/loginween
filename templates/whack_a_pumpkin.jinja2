@@ -1,0 +1,17 @@
+{% extends "gamebase.jinja2" %}
+
+{% block gamenav %}
+<li class="nav-item">
+    <a class="nav-link" href="/pumpkin_roll">Pumpkin Roll</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/pumpkin_memory">Pumpkin Memory</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link  active" aria-current="page" href="/whack_a_pumpkin">Whack a Pumpkin</a>
+</li>
+{% endblock %}
+
+{% block title %}Whack a Pumpkin{% endblock title %}
+
+{% block game_js %}<script src="/static/js/whack_a_pumpkin.js"></script>{% endblock %}
