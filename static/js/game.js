@@ -1,12 +1,12 @@
 const WIDTH = 1280;
 const HEIGHT = 720;
 
-function change_setting(category, setting, value) {
-    localStorage.setItem(setting, value);
+function change_setting(category, setting, value, GAME_TITLE) {
+    localStorage.setItem(`${GAME_TITLE} ${setting}`, value);
     go("settings", category);
 }
 
-function show_settings(category, SETTINGS) {
+function show_settings(category, GAME_TITLE, SETTINGS) {
     const x = 400;
     const label_x = 50;
     const space_between = 100;
@@ -26,10 +26,10 @@ function show_settings(category, SETTINGS) {
 
         create_label(label_x, y + 10, key, 32);
         
-        let value = localStorage.getItem(key);
+        let value = localStorage.getItem(`${GAME_TITLE} ${key}`);
 
-        if (value == undefined) {
-            localStorage.setItem(key, settings_dict.default);
+        if (value == null) {
+            localStorage.setItem(`${GAME_TITLE} ${key}`, settings_dict.default);
             value = settings_dict.default;
         }
 
@@ -39,25 +39,25 @@ function show_settings(category, SETTINGS) {
                     "ON", 
                     value === "true" ? color(255, 255, 255) : color(127, 127, 127),
                     color(0, 0, 0, 0),  
-                    () => { change_setting(category, currentKey, true); }
+                    () => { change_setting(category, currentKey, true, GAME_TITLE); }
                 ], 
                 [
                     "OFF", 
                     value === "false" ? color(255, 255, 255) : color(127, 127, 127),
                     color(0, 0, 0, 0),  
-                    () => { change_setting(category, currentKey, false); }
+                    () => { change_setting(category, currentKey, false, GAME_TITLE); }
                 ]
             ], 100, 50, 20);
 
         }
         else if (settings_dict.type == "option") {
-            create_dropdown(x, y, 300, 75, settings_dict.options, 0, (option) => {
-                localStorage.setItem(currentKey, option);
+            create_dropdown(x, y, 300, 75, settings_dict.options, settings_dict.options.indexOf(value), (option) => {
+                localStorage.setItem(`${GAME_TITLE} ${currentKey}`, option);
             });
         }
         else if (settings_dict.type == "slider") {
             create_slider(x, y, 400, Number(settings_dict.min), Number(settings_dict.max), Number(value), (new_value) => {
-                localStorage.setItem(currentKey, new_value);
+                localStorage.setItem(`${GAME_TITLE} ${currentKey}`, new_value);
             });
         }
         
@@ -73,7 +73,7 @@ function start_game() {
             canvas: document.getElementById("canvas"),
             root: document.getElementById("game-container"),
             crisp: !localStorage.getItem("Anti-Alasing"),
-            texFilter: localStorage.getItem("Texture Filtering").toLowerCase(),
+            texFilter: (localStorage.getItem("Texture Filtering") || "nearest").toLowerCase(),
             maxFPS: Number(localStorage.getItem("FPS Limit")),
             font: "New Rocker",
             background: "#e18888",
@@ -99,10 +99,10 @@ function start_game() {
         horizontal_buttons(10, 10, generated_button_lists, 200, 75, 10);
 
         if (setting_category != null) {
-            show_settings(setting_category, SETTINGS);
+            show_settings(setting_category, GAME_TITLE, SETTINGS);
         }
         else {
-            show_settings(Object.keys(SETTINGS)[0], SETTINGS);
+            show_settings(Object.keys(SETTINGS)[0], GAME_TITLE, SETTINGS);
         }
     })
 

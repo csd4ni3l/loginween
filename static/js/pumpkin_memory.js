@@ -2,13 +2,13 @@ function setup_game() {
     loadSprite("pumpkin", "/static/graphics/pumpkin.png");
     const SETTINGS = {
         "Graphics": {
-            "Anti-Aliasing": {"type": "bool", "default": true},
+            "Anti-Aliasing": {"type": "bool", "default": "true"},
             "Texture Filtering": {"type": "option", "options": ["Nearest", "Linear"], "default": "Linear"},
             "FPS Limit": {"type": "slider", "min": 0, "max": 480, "default": 60},
         },
         "Sound": {
-            "Music": {"type": "bool", "default": true},
-            "SFX": {"type": "bool", "default": true},
+            "Music": {"type": "bool", "default": "true"},
+            "SFX": {"type": "bool", "default": "true"},
             "Music Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
             "SFX Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
         },
