@@ -1,5 +1,16 @@
 const WIDTH = 1280;
 const HEIGHT = 720;
+let music_played = false;
+
+function jumpscare() {
+    play("jumpscare", {
+        volume: 1.5
+    })
+    const jumpscare_sprite = create_sprite(0, 0, "jumpscare");
+    setTimeout(() => {
+        destroy(jumpscare_sprite);
+    }, 1500);
+}
 
 function change_setting(category, setting, value, GAME_TITLE) {
     localStorage.setItem(`${GAME_TITLE} ${setting}`, value);
@@ -10,15 +21,9 @@ function show_settings(category, GAME_TITLE, SETTINGS) {
     const x = 400;
     const label_x = 50;
     const space_between = 100;
-    let y;
+    let y = 130 + space_between;
 
-    if (category == "Graphics") {
-        y = 130 + space_between;
-        create_label(label_x, y - space_between, "These settings need a page reload to take effect!", 32);
-    }
-    else {
-        y = 130;
-    }
+    create_label(label_x, y - space_between, "All settings require a page reload to take effect!", 32);
     
     for (let key in SETTINGS[category]) {
         const settings_dict = SETTINGS[category][key];
@@ -65,6 +70,37 @@ function show_settings(category, GAME_TITLE, SETTINGS) {
     }
 }
 
+function create_start_overlay(GAME_TITLE) {
+    const overlay = add([
+        rect(WIDTH, HEIGHT),
+        color(0, 0, 0),
+        opacity(0.6),
+        pos(0, 0),
+        area(),
+        z(1000),
+        "overlay"
+    ])
+
+    const text_label = add([
+        text("Click to Start", { size: 48 }),
+        pos(WIDTH / 2, HEIGHT / 2),
+        anchor("center"),
+        color(255, 255, 255),
+        z(1001)
+    ])
+
+    onClick("overlay", () => {
+        const bgm = play("music", {
+            volume: Number(localStorage.getItem(`${GAME_TITLE} Music Volume`) || 50) / 100,
+            loop: true
+        });
+
+        destroy(overlay);
+        destroy(text_label);
+    })
+}
+
+
 function start_game() {
     const [GAME_TITLE, SETTINGS] = game_info();
 
@@ -79,21 +115,15 @@ function start_game() {
             maxFPS: Number(localStorage.getItem(`${GAME_TITLE} FPS Limit`)),
             font: "New Rocker",
             background: "#e18888",
-            buttons: {
-                up: {
-                    keyboard: "up",
-                    gamepad: "south", 
-                },
-                jump: {
-                    keyboard: "space",
-                    gamepad: "a"
-                }
-            }
         }
     );
 
     setup_game();
     
+    loadSprite("jumpscare", "/static/graphics/jumpscare.jpg");
+    loadSound("jumpscare", "/static/sound/jumpscare.mp3");
+    loadSound("music", "/static/sound/music.mp3");
+
     scene("settings", (setting_category) => {
         let generated_button_lists = Object.entries(SETTINGS).map(([key, value]) => [key, color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("settings", key)]);
         generated_button_lists = [["Back", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("main_menu")]].concat(generated_button_lists);
@@ -111,6 +141,10 @@ function start_game() {
     scene("main_menu", () => {
         create_label(WIDTH / 2 - 16 * GAME_TITLE.length, HEIGHT / 4, GAME_TITLE, 56);
         vertical_buttons(WIDTH / 4, HEIGHT / 2.25, [["Play", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("play")], ["Settings", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("settings")]], WIDTH / 2, HEIGHT / 8, HEIGHT / 50)
+        if (!music_played) {
+            create_start_overlay(GAME_TITLE);
+            music_played = true;
+        }
     });
 
     go("main_menu");

@@ -7,10 +7,11 @@ function game_info() {
         },
         "Sound": {
             "Music": {"type": "bool", "default": "true"},
-            "SFX": {"type": "bool", "default": "true"},
             "Music Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
-            "SFX Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
         },
+        "Spooky": {
+            "Jumpscares": {"type": "bool", "default": "true"}
+        }
     };
     
     return ["Pumpkin Memory", SETTINGS];
@@ -20,8 +21,6 @@ function setup_game() {
     loadSprite("pumpkin", "/static/graphics/pumpkin.png");
 
     scene("game", (difficulty, pumpkin_array, revealed, found_pairs, start) => {
-        create_button(5, 5, 150, 75, "Back", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("main_menu"))
-
         let cols;
         switch (difficulty) {
             case "easy": pumpkin_pairs = 5; cols = 5; break; 
@@ -87,6 +86,24 @@ function setup_game() {
             timer_label.text = `Time spent: ${(elapsed / 1000).toFixed(1)}s Best Time: ${best_time}s`
         }, 100);
 
+        let jumpscare_interval_id;
+        if (localStorage.getItem("Pumpkin Memory Jumpscares") == "true") {
+            jumpscare_interval_id = setInterval(() => {
+                if (Math.random() < 0.035) {
+                    jumpscare();
+                }
+            }, 1000);
+        }
+
+        create_button(5, 5, 150, 75, "Back", color(127, 127, 127), color(0, 0, 0, 0), () => {
+            if (localStorage.getItem("Pumpkin Memory Jumpscares") == "true") {
+                clearInterval(jumpscare_interval_id);
+            }
+            clearInterval(timer_interval_id);
+            go("main_menu");
+        })
+        
+
         if (pumpkin_pairs == found_pairs.length - 1) {
             const elapsed = performance.now() - start;
             if ((elapsed / 1000).toFixed(1) < best_time) {
@@ -113,6 +130,7 @@ function setup_game() {
                         wait(0.5, () => {
                             if (found_pair == null) {
                                 clearInterval(timer_interval_id);
+                                clearInterval(jumpscare_interval_id);
                                 go("game", difficulty, arr, [], found_pairs, start);
                             }
                             else {
@@ -130,6 +148,7 @@ function setup_game() {
                     btn.scale = 1.1;
                     tween(btn.scale, 1, 0.2, (val) => btn.scale = val);
                     clearInterval(timer_interval_id);
+                    clearInterval(jumpscare_interval_id);
                     go("game", difficulty, arr, revealed.concat([index]), found_pairs, start);
                 })
             }

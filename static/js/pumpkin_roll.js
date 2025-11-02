@@ -7,12 +7,13 @@ function game_info() {
         },
         "Sound": {
             "Music": {"type": "bool", "default": "true"},
-            "SFX": {"type": "bool", "default": "true"},
             "Music Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
-            "SFX Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
         },
         "Input": {
             "Controller Enabled": {"type": "bool", "default": "true"}
+        },
+        "Spooky": {
+            "Jumpscares": {"type": "bool", "default": "true"}
         }
     };
     
@@ -83,7 +84,21 @@ function setup_game() {
         
         pumpkin_sprite.isJumping = false;
 
-        create_button(5, 5, 150, 75, "Back", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("main_menu"))
+        let jumpscare_interval_id;
+        if (localStorage.getItem("Pumpkin Roll Jumpscares") == "true") {
+            jumpscare_interval_id = setInterval(() => {
+                if (Math.random() < 0.035) {
+                    jumpscare();
+                }
+            }, 1000);
+        }
+
+        create_button(5, 5, 150, 75, "Back", color(127, 127, 127), color(0, 0, 0, 0), () => {
+            if (localStorage.getItem("Pumpkin Roll Jumpscares") == "true") {
+                clearInterval(jumpscare_interval_id);
+            }
+            go("main_menu");
+        })
         
         onCollide("pumpkin", "enemy", () => {
             if (game_over) return;
@@ -94,6 +109,10 @@ function setup_game() {
             }
 
             create_label(520, 320, `Game Over!\nScore: ${Math.floor(score)}\nHigh Score: ${high_score}`, 48);
+
+            if (localStorage.getItem("Pumpkin Roll Jumpscares") == "true") {
+                setTimeout(jumpscare, 500);
+            }
         })
 
         enemy_spawn_with_check = (count) => {
@@ -136,7 +155,7 @@ function setup_game() {
                 }
             }
 
-            if (isKeyDown("space") && !pumpkin_sprite.isJumping) {
+            if ((isKeyDown("space") || (localStorage.getItem("Pumpkin Roll Controller Enabled") === "true" && isGamepadButtonDown("south"))) && !pumpkin_sprite.isJumping) {
                 pumpkin_sprite.vy = JUMP_VELOCITY;
                 pumpkin_sprite.isJumping = true;
             }

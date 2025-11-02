@@ -116,8 +116,8 @@ memory_best_medium = localStorage.getItem("memory_best_medium") || "None"
 memory_best_hard = localStorage.getItem("memory_best_hard") || "None"
 memory_best_extrahard = localStorage.getItem("memory_best_extrahard") || "None"
 
-document.getElementById("pumpkin_roll_highscore").textContent = `Pumpkin Roll High Score: ${formatTime(pumpkin_roll_highscore)}`;
-document.getElementById("whackapumpkin_highscore").textContent = `Whack a Pumpkin High Score: ${formatTime(whackapumpkin_highscore)}`;
+document.getElementById("pumpkin_roll_highscore").textContent = `Pumpkin Roll High Score: ${pumpkin_roll_highscore}`;
+document.getElementById("whackapumpkin_highscore").textContent = `Whack a Pumpkin High Score: ${whackapumpkin_highscore}`;
 document.getElementById("memory_best_easy").textContent = `Pumpkin Memory (Easy) Best Time: ${formatTime(memory_best_easy)}`;
 document.getElementById("memory_best_medium").textContent = `Pumpkin Memory (Medium) Best Time: ${formatTime(memory_best_medium)}`;
 document.getElementById("memory_best_hard").textContent = `Pumpkin Memory (Hard) Best Time: ${formatTime(memory_best_hard)}`;

@@ -7,9 +7,10 @@ function game_info() {
         },
         "Sound": {
             "Music": {"type": "bool", "default": "true"},
-            "SFX": {"type": "bool", "default": "true"},
             "Music Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
-            "SFX Volume": {"type": "slider", "min": 0, "max": 100, "default": 50},
+        },
+        "Spooky": {
+            "Jumpscares": {"type": "bool", "default": "true"}
         }
     };
 
@@ -68,7 +69,24 @@ function setup_game() {
             scale(0.85)
         ]);
 
-        create_button(5, 5, 150, 75, "Back", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("main_menu"))
+        let jumpscare_interval_id;
+        if (localStorage.getItem("Whack a Pumpkin Jumpscares") == "true") {
+            jumpscare_interval_id = setInterval(() => {
+                if (Math.random() < 0.035) {
+                    jumpscare();
+                }
+            }, 1000);
+        }
+
+        create_button(5, 5, 150, 75, "Back", color(127, 127, 127), color(0, 0, 0, 0), () => {
+            game_over = true;
+            if (localStorage.getItem("Whack a Pumpkin Jumpscares") == "true") {
+                clearInterval(jumpscare_interval_id);
+            }
+            go("main_menu");
+        })
+        
+
         const info_label = create_label(525, 50, `Time left: 120s\nScore: ${score}\nHigh Score: ${high_score}`);
 
         function spawn_pumpkins() {
@@ -104,6 +122,9 @@ function setup_game() {
 
                 destroy(bg);
                 destroy(info_label);
+                if (localStorage.getItem("Whack a Pumpkin Jumpscares") == "true") {
+                    setTimeout(jumpscare, 500);
+                }
             }
             else {
                 info_label.text = `Time left: ${(120 - (elapsed / 1000)).toFixed(1)}s\nScore: ${score}\nHigh Score: ${high_score}`;
