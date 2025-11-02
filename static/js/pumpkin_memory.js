@@ -67,15 +67,30 @@ function setup_game() {
             revealed = [];
         }
         
+        let best_time = Number(localStorage.getItem("pumpkin_memory_best_time")) || 99999;
+        let first_time = best_time == 99999;
+
+        const best_time_display = (best_time == 99999) ? "None" : `${best_time}s`;
         const elapsed = performance.now() - start;
-        const timer_label = create_label(520, 5, `Time spent: ${(elapsed / 1000).toFixed(1)} s`);
+        const timer_label = create_label(520, 5, `Time spent: ${(elapsed / 1000).toFixed(1)}s Best Time: ${best_time_display}`);
+
         const timer_interval_id = setInterval(() => {
             const elapsed = performance.now() - start;
-            timer_label.text = `Time spent: ${(elapsed / 1000).toFixed(1)} s`
+            if (first_time) {
+                best_time = (elapsed / 1000).toFixed(1);
+            }
+
+            timer_label.text = `Time spent: ${(elapsed / 1000).toFixed(1)}s Best Time: ${best_time}s`
         }, 100);
 
         if (pumpkin_pairs == found_pairs.length - 1) {
-            create_label(520, 320, `You win!\nTime took: ${(elapsed / 1000).toFixed(1)} s`, 48);
+            const elapsed = performance.now() - start;
+            if ((elapsed / 1000).toFixed(1) < best_time) {
+                best_time = (elapsed / 1000).toFixed(1);
+            }
+            localStorage.setItem(`memory_best_${pumpkin_pairs}`, best_time);
+            
+            create_label(520, 320, `You win!\nTime took: ${(elapsed / 1000).toFixed(1)} s Best Time: ${best_time_display}`, 48);
             return;
         }
 
