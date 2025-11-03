@@ -21,6 +21,12 @@ function setup_game() {
     loadSprite("pumpkin", "/static/graphics/pumpkin.png");
 
     scene("game", (difficulty, pumpkin_array, revealed, found_pairs, start) => {
+        if (localStorage.getItem("Pumpkin Memory Jumpscares") == "true") {
+            if (Math.random() < 0.1) {
+                jumpscare();
+            }
+        }
+
         let cols;
         switch (difficulty) {
             case "easy": pumpkin_pairs = 5; cols = 5; break; 
@@ -89,7 +95,7 @@ function setup_game() {
         let jumpscare_interval_id;
         if (localStorage.getItem("Pumpkin Memory Jumpscares") == "true") {
             jumpscare_interval_id = setInterval(() => {
-                if (Math.random() < 0.035) {
+                if (Math.random() < 0.05) {
                     jumpscare();
                 }
             }, 1000);

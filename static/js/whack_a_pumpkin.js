@@ -72,7 +72,7 @@ function setup_game() {
         let jumpscare_interval_id;
         if (localStorage.getItem("Whack a Pumpkin Jumpscares") == "true") {
             jumpscare_interval_id = setInterval(() => {
-                if (Math.random() < 0.035) {
+                if (Math.random() < 0.05) {
                     jumpscare();
                 }
             }, 1000);
@@ -100,7 +100,12 @@ function setup_game() {
 
         onClick("pumpkin", (pumpkin) => {
             destroy(pumpkin);
-            
+            if (localStorage.getItem("Whack a Pumpkin Jumpscares") == "true") {
+                if (Math.random() < 0.1) {
+                    jumpscare();
+                }
+            }
+    
             score += 1;
             if (score > high_score) {
                 high_score = score;

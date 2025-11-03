@@ -108,6 +108,10 @@ function setup_game() {
                 destroy(enemy);
             }
 
+            if (localStorage.getItem("Pumpkin Roll Jumpscares") == "true") {
+                jumpscare();
+            }
+
             create_label(520, 320, `Game Over!\nScore: ${Math.floor(score)}\nHigh Score: ${high_score}`, 48);
 
             if (localStorage.getItem("Pumpkin Roll Jumpscares") == "true") {

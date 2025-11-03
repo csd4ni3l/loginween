@@ -141,7 +141,7 @@ function start_game() {
     scene("main_menu", () => {
         create_label(WIDTH / 2 - 16 * GAME_TITLE.length, HEIGHT / 4, GAME_TITLE, 56);
         vertical_buttons(WIDTH / 4, HEIGHT / 2.25, [["Play", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("play")], ["Settings", color(127, 127, 127), color(0, 0, 0, 0), scene_lambda("settings")]], WIDTH / 2, HEIGHT / 8, HEIGHT / 50)
-        if (!music_played) {
+        if (!music_played && localStorage.getItem(`${GAME_TITLE} Music`) == 'true') {
             create_start_overlay(GAME_TITLE);
             music_played = true;
         }
