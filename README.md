@@ -22,3 +22,7 @@ Live Demo: https://loginween.csd4ni3l.hu
 
 ## Docker Compose
 - Download the `docker-compose.yml` file from this repo and run `docker compose up -d` next to it.
+
+---
+**Migration Notice:** This repository has been moved to https://git.csd4ni3l.hu/csd4ni3l/loginween
+---
