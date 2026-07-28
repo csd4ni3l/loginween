@@ -22,3 +22,8 @@ Live Demo: https://loginween.csd4ni3l.hu
 
 ## Docker Compose
 - Download the `docker-compose.yml` file from this repo and run `docker compose up -d` next to it.
+## Mirrors
+
+[![Forgejo](https://img.shields.io/badge/Forgejo-git.csd4ni3l.hu-1e90ff)](https://git.csd4ni3l.hu/csd4ni3l/loginween)
+[![GitHub](https://img.shields.io/badge/GitHub-github.com-181717)](https://github.com/csd4ni3l/loginween)
+[![Codeberg](https://img.shields.io/badge/Codeberg-codeberg.org-2185D0)](https://codeberg.org/csd4ni3l/loginween)
